@@ -1,0 +1,20 @@
+
+
+# POST http://localhost:8081/api/v1/upload
+# Content-Type: application/json
+# Accept: application/json
+
+# {
+#     "file": null,
+#     "teacherDocument": "1",
+#     "SubjectId": "1",
+#     "groupId": "1"
+# }
+
+
+# GET http://localhost:8081/api/v1/upload
+# Content-Type: application/json
+
+
+GET http://localhost:8081/welcome
+Content-Type: application/json

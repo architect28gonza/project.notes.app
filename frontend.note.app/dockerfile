@@ -1,0 +1,49 @@
+# De forma predeterminada, compila en JDK 17 en CentOS 7.
+ARG jdk=21
+# Red Hat UBI 9 (ubi9-minimal) debe usarse en JDK 20 y versiones posteriores.
+ARG dist=ubi9-minimal
+FROM eclipse-temurin:${jdk}-${dist}
+
+LABEL org.opencontainers.image.source=https://github.com/jboss-dockerfiles/wildfly org.opencontainers.image.title=wildfly org.opencontainers.imag.url=https://github.com/jboss-dockerfiles/wildfly org.opencontainers.image.vendor=WildFly
+
+# A partir de jdk 21 eclipse-temurin se basa en ubi9-minimal versión 9.3
+# que no incluye el paquete shadow-utils que proporciona comandos groupadd y useradd
+# EJECUCIÓN condicional: SI no hay groupadd Y microdnf ENTONCES: actualice, instale Shadow-Utils, limpie
+RUN if ! [ -x "$(command -v groupadd)" ] && [ -x "$(command -v microdnf)" ]; then microdnf update -y && microdnf install --best --nodocs -y shadow-utils && microdnf clean all; fi
+
+WORKDIR /opt/jboss
+
+RUN groupadd -r jboss -g 1000 && useradd -u 1000 -r -g jboss -m -d /opt/jboss -s /sbin/nologin -c "JBoss user" jboss && \
+    chmod 755 /opt/jboss
+
+# Establecer la variable de entorno WILDFLY_VERSION
+ENV WILDFLY_VERSION 32.0.0.Final
+ENV WILDFLY_SHA1 9b6d762aa4662045fc3e7329a1ed1c0d457daf6d
+ENV JBOSS_HOME /opt/jboss/wildfly
+
+USER root
+
+# Agregue la distribución WildFly a /opt y haga que Wildfly sea el propietario del contenido de alquitrán extraído.
+# Asegúrese de que la distribución esté disponible en un lugar conocido
+RUN cd $HOME \
+    && curl -L -O https://github.com/wildfly/wildfly/releases/download/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz \
+    && sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 \
+    && tar xf wildfly-$WILDFLY_VERSION.tar.gz \
+    && mv $HOME/wildfly-$WILDFLY_VERSION $JBOSS_HOME \
+    && rm wildfly-$WILDFLY_VERSION.tar.gz \
+    && chown -R jboss:0 ${JBOSS_HOME} \
+    && chmod -R g+rw ${JBOSS_HOME}
+
+
+# Copia tu archivo WAR de la aplicación al directorio de implementación de WildFly
+COPY ./target/appweb.war /opt/jboss/wildfly/standalone/deployments/
+
+# Ensure signals are forwarded to the JVM process correctly for graceful shutdown
+ENV LAUNCH_JBOSS_IN_BACKGROUND true
+
+USER jboss
+
+# Exponer los puertos en los que estamos interesados
+EXPOSE 8080
+
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0"]

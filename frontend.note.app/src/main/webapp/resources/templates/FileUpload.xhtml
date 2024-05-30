@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:form>
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <p:outputLabel for="input-document" styleClass="mt-1" value="Digite su núm. Documento" />
+                <div class="ui-inputgroup">
+                    <p:inputText id="input-document" value="#{bbeanForm.formData.teacherDocument}" autocomplete="off"
+                        placeholder="Documento" required="true" />
+                    <p:commandButton type="submit" value="Buscar"
+                        actionListener="#{bbeanForm.handlesearchTeacherDocument}" update="selectSubject" />
+                </div>
+            </div>
+            <div class="col-12 md:col-4">
+                <p:outputLabel for="@next" styleClass="mt-1" value="Seleccione la asignaruta que imparte" />
+                <div class="ui-inputgroup">
+                    <p:selectOneMenu id="selectSubject" styleClass="w-100" value="#{bbeanForm.formData.subjectId}">
+                        <f:selectItem itemLabel="Seleccionar asignatura" itemValue="#{null}" />
+                        <f:selectItems value="#{bbeanForm.lstSubjects}" var="sub" itemValue="#{sub.id}"
+                            itemLabel="#{sub.name}" />
+                        <p:ajax listener="#{bbeanForm.handleSubjectSelection}" update="groupId" />
+                    </p:selectOneMenu>
+                </div>
+            </div>
+            <div class="col-12 md:col-4">
+                <p:outputLabel for="@next" styleClass="mt-1" value="Seleccione el grupo" />
+                <div class="ui-inputgroup">
+                    <p:selectOneMenu id="groupId" styleClass="w-100" value="#{bbeanForm.formData.tableNameId}">
+                        <f:selectItem itemLabel="Seleccionar grupo" itemValue="#{null}" />
+                        <f:selectItems value="#{bbeanForm.lstGroup}" var="gro" itemValue="#{gro.id}"
+                            itemLabel="#{gro.name}" />
+                        <p:ajax update="@this" />
+                    </p:selectOneMenu>
+                </div>
+            </div>
+        </div>
+    </h:form>
+    <hr />
+    <h:form id="form-file" enctype="multipart/form-data" prependId="false">
+        <p:messages id="messagealert" showDetail="true" />
+        <p:fileUpload id="btnUploadFile" listener="#{bbeanFile.handleFileUpload}" mode="advanced" dragDropSupport="true"
+            multiple="true" update="messagealert" sizeLimit="2048000" fileLimit="3"
+            invalidSizeMessage="El tamaño máximo del archivo permitido es de 2 MB"
+            invalidFileMessage="Solo se permiten archivos en formato Excel (.xlsx, .xls)" />
+    </h:form>
+
+</ui:composition>
