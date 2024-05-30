@@ -65,7 +65,7 @@ public class UploadImpl implements UploadServices {
         try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
             var stream = reader.readAll().stream();
             getValuesPart(stream).ifPresent(values -> {
-                String sqlQuery = "INSERT INTO " + tableName + " VALUES " + values + ";";
+                String sqlQuery = "INSERT INTO ".concat(tableName).concat(" VALUES ").concat(values) + ";";
                 if (!sqlQuery.endsWith("VALUES ;")) {
                     /* Ejecutamos la consulta para instar en la base de datos */
                     Query nativeQuery = entityManager.createNativeQuery(sqlQuery);
