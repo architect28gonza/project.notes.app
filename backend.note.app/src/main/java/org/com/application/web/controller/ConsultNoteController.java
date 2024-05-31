@@ -1,8 +1,10 @@
 package org.com.application.web.controller;
 
+import java.util.List;
+
 import org.com.application.domain.dto.RequestConsultNotes;
-import org.com.application.domain.dto.ResponseConsultNoteDto;
 import org.com.application.domain.services.ConsultNotesServices;
+import com.note.persistence.entitys.StudentInfoEntity;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -23,7 +25,7 @@ public class ConsultNoteController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response consultNotesStudents(RequestConsultNotes consult) {
-        ResponseConsultNoteDto consultNote = this.consultNotesServices.consultStudents(consult);
-        return Response.ok(consultNote).status(consultNote.getStatus()).build();
+        List<StudentInfoEntity> consultNote = this.consultNotesServices.consultStudents(consult);
+        return Response.ok(consultNote).status(consultNote.isEmpty() ? 404 : 200).build();
     }
 }

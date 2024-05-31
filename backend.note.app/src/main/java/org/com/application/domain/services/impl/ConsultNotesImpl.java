@@ -3,7 +3,6 @@ package org.com.application.domain.services.impl;
 import java.util.List;
 
 import org.com.application.domain.dto.RequestConsultNotes;
-import org.com.application.domain.dto.ResponseConsultNoteDto;
 import org.com.application.domain.services.ConsultNotesServices;
 
 import com.note.persistence.entitys.StudentInfoEntity;
@@ -25,26 +24,29 @@ public class ConsultNotesImpl implements ConsultNotesServices {
     private GroupListRepository groupListRepository;
 
     @Override
-    public ResponseConsultNoteDto consultStudents(RequestConsultNotes consultNotes) {
+    public List<StudentInfoEntity> consultStudents(RequestConsultNotes consultNotes) {
         String teacherDocument = consultNotes.getTeacherDocument();
         int limit = consultNotes.getLimit();
         int page = consultNotes.getPage();
         int subjectId = consultNotes.getSubjectId();
         long groupId = consultNotes.getGroupId();
+        boolean isFilter = consultNotes.isFilter();
+        String nameStudent = consultNotes.getNameStudent();
+
+        System.out.println(consultNotes.toString());
 
         String nameTable = getNameTable(groupId);
-        String sqlQuery = buildSqlQuery(nameTable);
+        String sqlQuery = buildSqlQuery(nameTable, isFilter, nameStudent);
 
-        List<StudentInfoEntity> results = executeQuery(teacherDocument, subjectId, groupId, limit, page, sqlQuery);
-
-        return createResponse(results);
+        return executeQuery(teacherDocument, subjectId, groupId, limit, page, sqlQuery);
     }
 
     private String getNameTable(long groupId) {
         return groupListRepository.findById(groupId).getName();
     }
 
-    private String buildSqlQuery(String table) {
+    private String buildSqlQuery(String table, boolean isFilter, String nameStudent) {
+        System.out.println(isFilter);
         return new StringBuilder()
                 .append("SELECT ")
                 .append("ts.stu_document AS document_student, ")
@@ -68,6 +70,7 @@ public class ConsultNotesImpl implements ConsultNotesServices {
                 .append("WHERE tt.tea_document = :document ")
                 .append("AND ts2.sub_id = :subject ")
                 .append("AND tgl.gro_id = :group ")
+                .append(isFilter ? "AND ts.stu_name ILIKE '%" + (nameStudent.toLowerCase()) + "%'" : "")
                 .toString();
     }
 
@@ -81,13 +84,4 @@ public class ConsultNotesImpl implements ConsultNotesServices {
         query.setMaxResults(limit);
         return query.getResultList();
     }
-
-    private ResponseConsultNoteDto createResponse(List<StudentInfoEntity> results) {
-        return ResponseConsultNoteDto.builder()
-                .lstStudents(results)
-                .message("Lista de estudiantes ya procesados")
-                .status(200)
-                .build();
-    }
-
 }

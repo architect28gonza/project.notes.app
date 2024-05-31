@@ -1,5 +1,6 @@
-package org.com.application.domain.dto;
+package com.note.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,8 +8,8 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
-public class RequestConsultNotes {
-    
+@Builder
+public class RequestDataNote {
     private int page;
     private int limit;
     private String teacherDocument;

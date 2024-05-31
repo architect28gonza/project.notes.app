@@ -5,7 +5,4 @@ import org.com.application.domain.dto.ResponseSubjectDto;
 public interface TeacherServices {
 
     ResponseSubjectDto getSubjectsByTeacherId(String teacherDocument);
-
-    // Optional<>
-    
 }

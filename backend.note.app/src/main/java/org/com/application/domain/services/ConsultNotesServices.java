@@ -1,10 +1,13 @@
 package org.com.application.domain.services;
 
+import java.util.List;
+
 import org.com.application.domain.dto.RequestConsultNotes;
-import org.com.application.domain.dto.ResponseConsultNoteDto;
+
+import com.note.persistence.entitys.StudentInfoEntity;
 
 public interface ConsultNotesServices {
     
-    public ResponseConsultNoteDto consultStudents(RequestConsultNotes consultNotes);
+    public List<StudentInfoEntity> consultStudents(RequestConsultNotes consultNotes);
 
 }

@@ -26,3 +26,6 @@ Content-Type: application/json
     "subjectId": 1,
     "groupId": 1
 }
+
+# GET http://localhost:8081/api/v1/teacher/1234567890
+# Content-Type: application/json
