@@ -76,7 +76,7 @@ public class FileUploadBean implements Serializable {
                 final String fileUpload = this.originalImageFile.getFileName().concat(" " + message);
                 FacesMessageUtil.getFacesMessage(FacesMessage.SEVERITY_INFO, "Completado", fileUpload);
             });
-            LOGGER.info("METHOD : handleFileUpload - OUT");
+            LOGGER.info("Archivo enviado para ser procesado - out");
         }
     }
 
@@ -84,13 +84,14 @@ public class FileUploadBean implements Serializable {
         RequestDataNote noteRequest = this.getRequestDataNote(false);
         Optional<List<StudentInfoDto>> lstStudentInfo = consultNoteServices.getDataNoteStudents(noteRequest);
         lstStudentInfo.ifPresent(this::setLstStudentInfo);
+        LOGGER.info("Consulta de notas para mostrar tabla- out");
     }
 
     public void consultStudentFilter() {
         RequestDataNote noteRequest = this.getRequestDataNote(true);
-        System.out.println(noteRequest);
         Optional<List<StudentInfoDto>> lstStudentInfo = consultNoteServices.getDataNoteStudents(noteRequest);
         lstStudentInfo.ifPresent(this::setLstStudentInfo);
+        LOGGER.info("Consulta de nota por filtro de busqueda - out");
     }
 
     private RequestDataNote getRequestDataNote(boolean entradaFilter) {

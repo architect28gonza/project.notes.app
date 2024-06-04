@@ -37,6 +37,7 @@ public class GenerateXlsx extends ClientSocket implements Serializable {
     public void init() {
         this.setContainerSupplier(ContainerProvider::getWebSocketContainer);
         this.setContainer(this.getContainerSupplier().get());
+        LOG.info("Inicializacion de container para session de socket");
     }
 
     public void sendMessageServerSocket() {

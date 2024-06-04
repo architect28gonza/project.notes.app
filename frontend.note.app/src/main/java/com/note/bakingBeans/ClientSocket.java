@@ -71,7 +71,7 @@ public class ClientSocket {
                 LOG.info("Envio de mensaje para obtener el ID");
             }
         } catch (IOException e) {
-            LOG.severe("Error send message socket : ".concat(e.getMessage()));
+            LOG.severe("Error - NO es posible enviar un mensaje con socket : ".concat(e.getMessage()));
         }
     }
 
