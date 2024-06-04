@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class ResponseDto {
     private String message;
-    private int status;
+    private int status = 404;
 }

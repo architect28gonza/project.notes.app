@@ -18,7 +18,7 @@ public class AwsConfig {
 
     @Bean
     public SqsAsyncClient createS3ClientAsync() {
-        return AwsS3Config.createsqsAsyncClient();
+        return AwsS3Config.createSqsAsyncClient();
     }
     
 }

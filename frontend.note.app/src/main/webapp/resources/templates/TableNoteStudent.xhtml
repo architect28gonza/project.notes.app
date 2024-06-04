@@ -12,7 +12,8 @@
 
             <p:dataTable id="tableNotesStudent" var="note" value="#{fbean.lstStudentInfo}"
                 widgetVar="consultTablesNotes" emptyMessage="No hay registros de notas estudiantes" scrollable="true"
-                scrollWidth="100%" size="small" style="white-space: nowrap;">
+                scrollWidth="100%" size="small" style="white-space: nowrap;" rows="10" paginator="true"
+                paginatorPosition="both" rowsPerPageTemplate="5,10,{ShowAll|'All'}">
 
                 <f:facet name="header">
                     <div class="products-table-header">
@@ -92,7 +93,8 @@
                 <hr />
                 <p:dataTable id="tableNotesStudentXlsx" var="note" value="#{gbean.lstStudentInfo}"
                     widgetVar="consultTablesNotesXlsx" emptyMessage="No hay registros de notas estudiantes"
-                    scrollable="true" scrollWidth="100%" size="small" style="white-space: nowrap;">
+                    scrollable="true" scrollWidth="100%" size="small" style="white-space: nowrap;" rows="10"
+                    paginator="true" paginatorPosition="both" rowsPerPageTemplate="3,5,10,15,{ShowAll|'All'}">
 
                     <p:column headerText="A" style="min-width: 100px;">
                         <h:outputText value="#{note.documentStudent}" />

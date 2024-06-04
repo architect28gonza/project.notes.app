@@ -78,8 +78,6 @@ public class ConsultNotesImpl implements ConsultNotesServices {
         query.setParameter("document", teacherDocument);
         query.setParameter("subject", subjectId);
         query.setParameter("group", groupId);
-        query.setFirstResult((page - 1) * limit);
-        query.setMaxResults(limit);
         return query.getResultList();
     }
 }

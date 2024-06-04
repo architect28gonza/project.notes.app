@@ -9,33 +9,49 @@ import java.nio.file.Paths;
 
 import org.json.JSONObject;
 
+import lombok.Getter;
+import lombok.Setter;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 
 public class AwsModelConfig {
 	
-	private String ACCESS_KEY_ID = "";
-	private String SECRET_ACCESS_KEY = "";
+	@Setter
+	@Getter
+	private String accessKeyId="";
+	
+	@Setter
+	private String secrectAccessId="";
 
-	private void getCredentiales() {
-		final String path = System.getProperty("user.dir");
+	public AwsModelConfig () {
+		this.getCredentials();
+	}
+
+
+	private void getCredentials() {
+		/* Se debe tener encuenta que como es modo preuba, Se coloca la ruta fija */
+		final String path = "/media/architech/Archivos/Proyectos Programacion/project.notes.app/module.note.app".concat("/credentialesaws.json");
 		try {
-            String content = new String(Files.readAllBytes(Paths.get(path.concat("credentialesaws.json"))));
-            JSONObject jsonObject = new JSONObject(content);
-            this.ACCESS_KEY_ID= jsonObject.getString("ACCESS_KEY_ID");
-            this.SECRET_ACCESS_KEY = jsonObject.getString("SECRET_ACCESS_KEY");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+			String content = new String(Files.readAllBytes(Paths.get(path)));
+			JSONObject jsonObject = new JSONObject(content);
+
+			this.setAccessKeyId(jsonObject.getString("ACCESS_KEY_ID"));
+			this.setSecrectAccessId(jsonObject.getString("SECRET_ACCESS_KEY"));
+
+		} catch (IOException e) {
+			System.out.println("Error reading credentials file: " + e.getMessage());
+		}
 	}
 
 	private StaticCredentialsProvider getStaticCredentialsProvider() {
-		this.getCredentiales();
+		if (this.accessKeyId.isEmpty() || this.secrectAccessId.isEmpty()) {
+			throw new IllegalArgumentException("Access Key ID and Secret Access Key cannot be blank.");
+		}
 		return StaticCredentialsProvider.create(
 				AwsBasicCredentials.create(
-						ACCESS_KEY_ID,
-						SECRET_ACCESS_KEY));
+						this.accessKeyId,
+						this.secrectAccessId));
 	}
 
 	public SqsClient createSqsClient() {
@@ -45,7 +61,7 @@ public class AwsModelConfig {
 				.build();
 	}
 
-	public SqsAsyncClient createsqsAsyncClient() {
+	public SqsAsyncClient createSqsAsyncClient() {
 		return SqsAsyncClient.builder()
 				.region(Region.US_EAST_1)
 				.credentialsProvider(getStaticCredentialsProvider())

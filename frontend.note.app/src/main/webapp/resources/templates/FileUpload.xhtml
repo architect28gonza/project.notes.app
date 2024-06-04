@@ -5,6 +5,7 @@
     <c:set var="bbean" value="#{bbeanForm}" />
 
     <h:form>
+        <p:growl id="growl" showDetail="true" />
         <div class="grid">
             <div class="col-12 md:col-4">
                 <p:outputLabel for="input-document" styleClass="mt-1" value="Digite su núm. Documento" />
@@ -12,7 +13,7 @@
                     <p:inputText id="input-document" value="#{bbean.formData.teacherDocument}" autocomplete="off"
                         placeholder="Documento" required="true" />
                     <p:commandButton type="submit" value="Buscar" actionListener="#{bbean.handlesearchTeacherDocument}"
-                        update="selectSubject" />
+                        update="selectSubject growl" />
                 </div>
             </div>
             <div class="col-12 md:col-4">
@@ -22,7 +23,7 @@
                         <f:selectItem itemLabel="Seleccionar asignatura" itemValue="#{null}" />
                         <f:selectItems value="#{bbean.lstSubjects}" var="sub" itemValue="#{sub.id}"
                             itemLabel="#{sub.name}" />
-                        <p:ajax listener="#{bbean.handleSubjectSelection}" update="groupId" />
+                        <p:ajax listener="#{bbean.handleSubjectSelection}" update="groupId growl" />
                     </p:selectOneMenu>
                 </div>
             </div>

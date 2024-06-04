@@ -122,7 +122,7 @@ public class ApiHttp {
             HttpEntity entity = response.getEntity();
             return Optional.ofNullable(entity != null ? EntityUtils.toString(entity) : null);
         } else {
-            return Optional.of("Error: " + statusCode);
+            return Optional.empty();
         }
     }
 }
