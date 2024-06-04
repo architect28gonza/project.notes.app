@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -16,7 +14,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
@@ -34,18 +31,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class ApiHttp {
 
     private static final String API_URL = "http://localhost:8081/";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Gson GSON = new Gson();
 
     public Optional<String> callApi(String endPoint) {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet(API_URL.concat(endPoint));
-        try {
-            HttpResponse response = httpClient.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            return Optional
-                    .of((statusCode == 200) ? EntityUtils.toString(response.getEntity()) : "Error: " + statusCode);
-        } catch (IOException e) {
-            return Optional.empty();
-        }
+        return executeGetRequest(API_URL.concat(endPoint));
     }
 
     public Optional<String> uploadFileApi(String endpoint, FormDto formData) {
@@ -57,17 +47,13 @@ public class ApiHttp {
             builder.addTextBody("tableNameId", String.valueOf(formData.getTableNameId()));
             builder.addTextBody("subjectId", String.valueOf(formData.getSubjectId()));
 
-            InputStream inputStream = formData.getOriginalImageFile().getInputStream();
-            builder.addBinaryBody("file", inputStream, ContentType.APPLICATION_OCTET_STREAM,
-                    formData.getOriginalImageFile().getFileName());
+            try (InputStream inputStream = formData.getOriginalImageFile().getInputStream()) {
+                builder.addBinaryBody("file", inputStream, ContentType.APPLICATION_OCTET_STREAM,
+                        formData.getOriginalImageFile().getFileName());
 
-            HttpEntity multipart = builder.build();
-            httpPost.setEntity(multipart);
-            HttpResponse response = httpClient.execute(httpPost);
-            HttpEntity entity = response.getEntity();
+                httpPost.setEntity(builder.build());
 
-            if (entity != null) {
-                return Optional.of(EntityUtils.toString(entity));
+                return executePostRequest(httpPost);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -77,71 +63,66 @@ public class ApiHttp {
 
     public Optional<List<StudentInfoDto>> consultNoteStudent(RequestDataNote consultNote, String endpoint) {
         String fullUrl = API_URL.concat(endpoint);
-        Gson gson = new Gson();
-        String json = gson.toJson(consultNote);
+        String json = GSON.toJson(consultNote);
+        HttpPost httpPost = new HttpPost(fullUrl);
+        httpPost.setHeader("Content-Type", "application/json");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
+
+        return executePostRequest(httpPost)
+                .map(this::parseStudentInfoDtoList);
+    }
+
+    private List<StudentInfoDto> parseStudentInfoDtoList(String json) {
+        try {
+            return OBJECT_MAPPER.readValue(json, new TypeReference<List<StudentInfoDto>>() {
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public void generateDocuemntoPost(String endpoint, RequestGenerateXlsxDto generateXlsxDto) {
+        String fullUrl = API_URL.concat(endpoint);
+        String json = GSON.toJson(generateXlsxDto);
+        HttpPost httpPost = new HttpPost(fullUrl);
+        httpPost.setHeader("Content-Type", "application/json");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
+
+        executePostRequest(httpPost).ifPresent(System.out::println);
+    }
+
+    private Optional<String> executeGetRequest(String url) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(fullUrl);
-
-            // Configurar los encabezados de la petición si es necesario
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setHeader("Accept", "application/json");
-
-            StringEntity stringEntity = new StringEntity(json);
-            httpPost.setEntity(stringEntity);
-
-            // Enviar la petición y obtener la respuesta
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                HttpEntity responseEntity = response.getEntity();
-                if (responseEntity != null) {
-                    String responseString = EntityUtils.toString(responseEntity);
-                    return Optional.ofNullable(parseJsonResponse(responseString));
-                }
+            HttpGet request = new HttpGet(url);
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                return handleResponse(response);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return Optional.empty();
     }
 
-    private List<StudentInfoDto> parseJsonResponse(String jsonResponse) throws IOException {
-        try {
-            return new ObjectMapper()
-                    .readValue(jsonResponse,
-                            new TypeReference<List<StudentInfoDto>>() {
-                            });
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-
-    public void generateDocuemntoPost(String endpoint, RequestGenerateXlsxDto generateXlsxDto) {
-        String fullUrl = API_URL.concat(endpoint);
-        Gson gson = new Gson();
-        String json = gson.toJson(generateXlsxDto);
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(fullUrl);
-
-            // Configurar los encabezados de la petición si es necesario
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setHeader("Accept", "application/json");
-
-            StringEntity stringEntity = new StringEntity(json);
-            httpPost.setEntity(stringEntity);
-
-            // Enviar la petición y obtener la respuesta
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                HttpEntity responseEntity = response.getEntity();
-                if (responseEntity != null) {
-                    String responseString = EntityUtils.toString(responseEntity);
-                    System.out.println(responseString);
-                    // return Optional.ofNullable(parseJsonResponse(responseString));
-                }
-            }
-        } catch (Exception e) {
+    private Optional<String> executePostRequest(HttpPost httpPost) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                CloseableHttpResponse response = httpClient.execute(httpPost)) {
+            return handleResponse(response);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        // return Optional.empty();
+        return Optional.empty();
     }
 
+    private Optional<String> handleResponse(CloseableHttpResponse response) throws IOException {
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode == 200) {
+            HttpEntity entity = response.getEntity();
+            return Optional.ofNullable(entity != null ? EntityUtils.toString(entity) : null);
+        } else {
+            return Optional.of("Error: " + statusCode);
+        }
+    }
 }

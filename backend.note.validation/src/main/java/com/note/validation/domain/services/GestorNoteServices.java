@@ -6,7 +6,7 @@ public interface GestorNoteServices {
 
     public void setGestionNote(
             String nameTable,
-            List<Long> lstIds, 
+            List<Long> lstIds,
             List<Double> lstPromedio);
 
 }

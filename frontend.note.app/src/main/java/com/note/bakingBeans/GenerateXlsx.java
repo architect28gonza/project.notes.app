@@ -31,22 +31,27 @@ public class GenerateXlsx extends ClientSocket implements Serializable {
 
     @Getter
     @Setter
-    private String message;
+    private boolean isOpenModel;
+
 
     @PostConstruct
     public void init() {
         this.setContainerSupplier(ContainerProvider::getWebSocketContainer);
         this.setContainer(this.getContainerSupplier().get());
+        this.setOpenModel(true);
         LOG.info("Inicializacion de container para session de socket");
     }
 
     public void sendMessageServerSocket() {
-        try {
-            this.validateSesionNotNull();
-            this.sendMessageSocket();
-        } catch (Exception e) {
-            LOG.severe("Accion no completada, No se puede acceder al socket : "
-                    .concat(e.getMessage()));
+        if (this.isOpenModel()) {
+            try {
+                this.validateSesionNotNull();
+                this.sendMessageSocket();
+                this.setOpenModel(false);
+            } catch (Exception e) {
+                LOG.severe("Accion no completada, No se puede acceder al socket : "
+                        .concat(e.getMessage()));
+            }
         }
     }
 
