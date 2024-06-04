@@ -16,16 +16,27 @@
 # Content-Type: application/json
 
 
-POST http://localhost:8081/api/v1/notes
-Content-Type: application/json
+# POST http://localhost:8081/api/v1/notes
+# Content-Type: application/json
 
-{
-    "page": 1,
-    "limit": 2,
-    "teacherDocument": "1234567890",
-    "subjectId": 1,
-    "groupId": 1
-}
+# {
+#     "page": 1,
+#     "limit": 2,
+#     "teacherDocument": "1234567890",
+#     "subjectId": 1,
+#     "groupId": 1
+# }
 
 # GET http://localhost:8081/api/v1/teacher/1234567890
 # Content-Type: application/json
+
+POST http://localhost:8081/api/v1/excel
+Content-Type: application/json
+
+{
+    "sockeId": "1231fsdfsfaf",
+    "teacherDocument": "123004343",
+    "documentId": 1,
+    "subjectId": 1,
+    "clusterId": 1
+}

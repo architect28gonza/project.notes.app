@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.note.ApiHttp;
 import com.note.dto.FormDto;
+import com.note.dto.RequestGenerateXlsxDto;
 import com.note.services.FileServices;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,5 +19,10 @@ public class FileImpl implements FileServices {
     @Override
     public Optional<String> sendFile(FormDto formData) {
         return this.apiHttp.uploadFileApi("api/v1/upload", formData);
-    }   
+    }
+
+    @Override
+    public void generateDocumentXlsx(RequestGenerateXlsxDto generateXlsxDto) {
+        this.apiHttp.generateDocuemntoPost("api/v1/excel", generateXlsxDto);
+    }
 }

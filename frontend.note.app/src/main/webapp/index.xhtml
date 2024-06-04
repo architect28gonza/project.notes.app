@@ -21,13 +21,6 @@
                 </div>
                 <div class="card-body">
                     <ui:include src="/resources/templates/FileUpload.xhtml" />
-                    <hr />
-                    <div class="container-body-socket">
-                        <h:form>
-                            <h:inputText value="#{bbeanSocket.message}" />
-                            <h:commandButton value="Enviar" action="#{bbeanSocket.sendMessageWebSocket}" />
-                        </h:form>
-                    </div>
                 </div>
             </div>
         </div>

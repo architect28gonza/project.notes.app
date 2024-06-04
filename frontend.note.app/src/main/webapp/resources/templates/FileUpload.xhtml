@@ -1,34 +1,37 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-    xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:h="http://xmlns.jcp.org/jsf/html">
+    xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <c:set var="bbean" value="#{bbeanForm}" />
 
     <h:form>
         <div class="grid">
             <div class="col-12 md:col-4">
                 <p:outputLabel for="input-document" styleClass="mt-1" value="Digite su núm. Documento" />
                 <div class="ui-inputgroup">
-                    <p:inputText id="input-document" value="#{bbeanForm.formData.teacherDocument}" autocomplete="off"
+                    <p:inputText id="input-document" value="#{bbean.formData.teacherDocument}" autocomplete="off"
                         placeholder="Documento" required="true" />
-                    <p:commandButton type="submit" value="Buscar"
-                        actionListener="#{bbeanForm.handlesearchTeacherDocument}" update="selectSubject" />
+                    <p:commandButton type="submit" value="Buscar" actionListener="#{bbean.handlesearchTeacherDocument}"
+                        update="selectSubject" />
                 </div>
             </div>
             <div class="col-12 md:col-4">
                 <p:outputLabel for="@next" styleClass="mt-1" value="Seleccione la asignaruta que imparte" />
                 <div class="ui-inputgroup">
-                    <p:selectOneMenu id="selectSubject" styleClass="w-100" value="#{bbeanForm.formData.subjectId}">
+                    <p:selectOneMenu id="selectSubject" styleClass="w-100" value="#{bbean.formData.subjectId}">
                         <f:selectItem itemLabel="Seleccionar asignatura" itemValue="#{null}" />
-                        <f:selectItems value="#{bbeanForm.lstSubjects}" var="sub" itemValue="#{sub.id}"
+                        <f:selectItems value="#{bbean.lstSubjects}" var="sub" itemValue="#{sub.id}"
                             itemLabel="#{sub.name}" />
-                        <p:ajax listener="#{bbeanForm.handleSubjectSelection}" update="groupId" />
+                        <p:ajax listener="#{bbean.handleSubjectSelection}" update="groupId" />
                     </p:selectOneMenu>
                 </div>
             </div>
             <div class="col-12 md:col-4">
                 <p:outputLabel for="@next" styleClass="mt-1" value="Seleccione el grupo" />
                 <div class="ui-inputgroup">
-                    <p:selectOneMenu id="groupId" styleClass="w-100" value="#{bbeanForm.formData.tableNameId}">
+                    <p:selectOneMenu id="groupId" styleClass="w-100" value="#{bbean.formData.tableNameId}">
                         <f:selectItem itemLabel="Seleccionar grupo" itemValue="#{null}" />
-                        <f:selectItems value="#{bbeanForm.lstGroup}" var="gro" itemValue="#{gro.id}"
+                        <f:selectItems value="#{bbean.lstGroup}" var="gro" itemValue="#{gro.id}"
                             itemLabel="#{gro.name}" />
                         <p:ajax update="@this" />
                     </p:selectOneMenu>
@@ -45,79 +48,6 @@
             invalidFileMessage="Solo se permiten archivos en formato Excel (.xlsx, .xls)" />
     </h:form>
 
-    <hr />
-    <h:form>
-        <div style="overflow-x: auto;">
-            <p:growl id="messages" showDetail="true" />
-
-            <p:dataTable id="tableNotesStudent" var="note" value="#{bbeanFile.lstStudentInfo}"
-                widgetVar="consultTablesNotes" emptyMessage="No hay registros de notas estudiantes" scrollable="true"
-                scrollWidth="100%" size="small" style="white-space: nowrap;">
-
-                <f:facet name="header">
-                    <div class="products-table-header">
-                        <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
-                            <p:inputText id="globalFilter" value="#{bbeanFile.nameStudent}"
-                                placeholder="Buscar por nombre" />
-                            <p:commandButton class="ml-2" value="Filtrar"
-                                actionListener="#{bbeanFile.consultStudentFilter}" update="tableNotesStudent" />
-                            <p:commandButton class="ml-4" value="Consultar" actionListener="#{bbeanFile.consultNotes}"
-                                update="tableNotesStudent" />
-                            <p:commandButton type="button" class="ml-5" value="Exportar XLSX" />
-                        </span>
-                    </div>
-                </f:facet>
-
-                <p:column headerText="Documento Est" style="min-width: 100px;">
-                    <h:outputText value="#{note.documentStudent}" />
-                </p:column>
-
-                <p:column headerText="Nombre Est" style="min-width: 150px;">
-                    <h:outputText value="#{note.nameStudent}" />
-                </p:column>
-
-                <p:column headerText="Nota 1" style="min-width: 50px;">
-                    <h:outputText value="#{note.note1}" />
-                </p:column>
-
-                <p:column headerText="Nota 2" style="min-width: 50px;">
-                    <h:outputText value="#{note.note2}" />
-                </p:column>
-
-                <p:column headerText="Nota 3" style="min-width: 50px;">
-                    <h:outputText value="#{note.note3}" />
-                </p:column>
-
-                <p:column headerText="Definitiva" style="min-width: 75px;">
-                    <h:outputText value="#{note.finalNote}" />
-                </p:column>
-
-                <p:column headerText="Estado" style="min-width: 100px;">
-                    <p:tag styleClass="w-100" value="#{note.status}"></p:tag>
-                </p:column>
-
-                <p:column headerText="Grupo" style="min-width: 100px;">
-                    <h:outputText value="#{note.nameGroup}" />
-                </p:column>
-
-                <p:column headerText="Profesor" style="min-width: 150px;">
-                    <h:outputText value="#{note.nameTeacher}" />
-                </p:column>
-
-                <p:column headerText="Asignatura" style="min-width: 150px;">
-                    <h:outputText value="#{note.nameSubject}" />
-                </p:column>
-
-                <p:column headerText="Documento procesado" style="min-width: 180px;">
-                    <h:outputText value="#{note.nameDocument}" />
-                </p:column>
-
-                <p:column headerText="Acciones" style="min-width: 100px;">
-                    <p:commandButton value="Notificar" />
-                </p:column>
-
-            </p:dataTable>
-        </div>
-    </h:form>
+    <ui:include src="/resources/templates/TableNoteStudent.xhtml" />
 
 </ui:composition>

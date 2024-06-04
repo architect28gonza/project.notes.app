@@ -34,7 +34,6 @@ public class ConsultNotesImpl implements ConsultNotesServices {
         String nameStudent = consultNotes.getNameStudent();
 
         System.out.println(consultNotes.toString());
-
         String nameTable = getNameTable(groupId);
         String sqlQuery = buildSqlQuery(nameTable, isFilter, nameStudent);
 
@@ -46,7 +45,6 @@ public class ConsultNotesImpl implements ConsultNotesServices {
     }
 
     private String buildSqlQuery(String table, boolean isFilter, String nameStudent) {
-        System.out.println(isFilter);
         return new StringBuilder()
                 .append("SELECT ")
                 .append("ts.stu_document AS document_student, ")
